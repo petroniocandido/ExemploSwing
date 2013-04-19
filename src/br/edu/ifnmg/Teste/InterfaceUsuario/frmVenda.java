@@ -239,7 +239,6 @@ public class frmVenda extends javax.swing.JInternalFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAdicionarItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAdicionarItemActionPerformed
-
         if (JOptionPane.showConfirmDialog(rootPane, "Deseja realmente adicionar o item?")
                 == 0) {
 

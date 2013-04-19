@@ -4,6 +4,8 @@
  */
 package br.edu.ifnmg.Teste.InterfaceUsuario;
 
+import br.edu.ifnmg.Teste.DataAccess.ProdutoDAO;
+import br.edu.ifnmg.Teste.DomainModel.Produto;
 import javax.swing.JOptionPane;
 
 /**
@@ -11,6 +13,8 @@ import javax.swing.JOptionPane;
  * @author petronio
  */
 public class frmSecundarioInterno extends javax.swing.JInternalFrame {
+
+    ProdutoDAO dao = new ProdutoDAO();
 
     /**
      * Creates new form frmSecundarioInterno
@@ -33,6 +37,9 @@ public class frmSecundarioInterno extends javax.swing.JInternalFrame {
         btnAtivar = new javax.swing.JButton();
         lblResultado = new javax.swing.JLabel();
         lblValor = new javax.swing.JLabel();
+        txtId = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
+        btnAbrir = new javax.swing.JButton();
 
         setClosable(true);
         setMaximizable(true);
@@ -53,6 +60,21 @@ public class frmSecundarioInterno extends javax.swing.JInternalFrame {
 
         lblValor.setText("                               ");
 
+        txtId.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtIdActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Código:");
+
+        btnAbrir.setText("Abrir");
+        btnAbrir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAbrirActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -60,15 +82,21 @@ public class frmSecundarioInterno extends javax.swing.JInternalFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(21, 21, 21)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblResultado)
-                    .addComponent(lblDescricao))
+                    .addComponent(lblDescricao)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(jLabel1)
+                        .addComponent(lblResultado)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblValor, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(txtId, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtDescricao, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnAtivar))
-                    .addComponent(lblValor, javax.swing.GroupLayout.PREFERRED_SIZE, 0, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(btnAtivar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(btnAbrir, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(87, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -79,33 +107,63 @@ public class frmSecundarioInterno extends javax.swing.JInternalFrame {
                     .addComponent(lblDescricao)
                     .addComponent(txtDescricao, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(btnAtivar))
-                .addGap(54, 54, 54)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txtId, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1)
+                    .addComponent(btnAbrir))
+                .addGap(21, 21, 21)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblResultado)
                     .addComponent(lblValor, javax.swing.GroupLayout.PREFERRED_SIZE, 22, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(138, Short.MAX_VALUE))
+                .addContainerGap(145, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnAtivarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAtivarActionPerformed
-        
-        if(JOptionPane.showConfirmDialog(rootPane,  "Deseja Salvar?") == 0){
-                lblResultado.setText( "Salvo!" );                
+
+        Produto p = new Produto(0, txtDescricao.getText(), 0);
+
+        if (JOptionPane.showConfirmDialog(rootPane, "Deseja Salvar?") == 0) {
+
+            if (dao.Salvar(p)) {
                 JOptionPane.showMessageDialog(rootPane, "Salvo com sucesso!");
+            } else {
+                JOptionPane.showMessageDialog(rootPane, "Falha ao salvar! Consulte o administrador do sistema!");
+            }
+
         } else {
-            lblResultado.setText( "Não Salvo!" );                
-            JOptionPane.showMessageDialog(rootPane,"Operação cancelada!");            
+            lblResultado.setText("Não Salvo!");
+            JOptionPane.showMessageDialog(rootPane, "Operação cancelada!");
         }
-        
+
     }//GEN-LAST:event_btnAtivarActionPerformed
 
+    private void txtIdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtIdActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtIdActionPerformed
+
+    private void btnAbrirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAbrirActionPerformed
+        int id = Integer.parseInt(txtId.getText());
+
+        Produto p = dao.Abrir(id);
+
+        if (p == null) {
+            JOptionPane.showMessageDialog(rootPane, "ID não existe!");
+        } else {
+            txtDescricao.setText(p.getNome());
+        }
+    }//GEN-LAST:event_btnAbrirActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAbrir;
     private javax.swing.JButton btnAtivar;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel lblDescricao;
     private javax.swing.JLabel lblResultado;
     private javax.swing.JLabel lblValor;
     private javax.swing.JTextField txtDescricao;
+    private javax.swing.JTextField txtId;
     // End of variables declaration//GEN-END:variables
 }
