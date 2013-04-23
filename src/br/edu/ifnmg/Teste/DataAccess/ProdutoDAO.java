@@ -5,9 +5,11 @@
 package br.edu.ifnmg.Teste.DataAccess;
 
 import br.edu.ifnmg.Teste.DomainModel.Produto;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -16,17 +18,61 @@ import java.util.logging.Logger;
  * @author petronio
  */
 public class ProdutoDAO {
+
     private BD bd;
-    
+
     public ProdutoDAO() {
         bd = new BD();
     }
-    
-    public boolean Salvar(Produto obj){
+
+    public boolean Salvar(Produto obj) {
         try {
-            Statement comando = bd.getConexao().createStatement();
-            comando.executeUpdate("insert into produtos(nome,valor) values('"+obj.getNome()
-                    +"','"+obj.getValor()+"')");
+            if (obj.getId() == 0) {
+                PreparedStatement comando = bd.getConexao().prepareStatement("insert into produtos(nome,valor) values(?,?)");
+                comando.setString(0, obj.getNome());
+                comando.setDouble(1, obj.getValor());
+                comando.executeUpdate();
+            } else {
+                PreparedStatement comando = bd.getConexao().prepareStatement("update produtos set nome = ?,valor = ? where id = ?");
+                comando.setString(0, obj.getNome());
+                comando.setDouble(1, obj.getValor());
+                comando.setDouble(2, obj.getId());
+                comando.executeUpdate();
+            }
+            return true;
+        } catch (SQLException ex) {
+            Logger.getLogger(ProdutoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
+        }
+    }
+
+    public Produto Abrir(int id) {
+        try {
+            Produto produto = new Produto(0, "", 0);
+
+            PreparedStatement comando = bd.getConexao().prepareStatement("select * from produtos where id = ?");
+            comando.setInt(0, id);
+            ResultSet resultado = comando.executeQuery();
+
+            resultado.first();
+
+            produto.setId(resultado.getInt("id"));
+            produto.setNome(resultado.getString("nome"));
+            produto.setValor(resultado.getDouble("valor"));
+
+            return produto;
+
+        } catch (SQLException ex) {
+            Logger.getLogger(ProdutoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+
+    public boolean Apagar(Produto obj) {
+        try {
+            PreparedStatement comando = bd.getConexao().prepareStatement("delete from produtos where id = ?");
+            comando.setInt(0, obj.getId());
+            comando.executeUpdate();
             return true;
         } catch (SQLException ex) {
             Logger.getLogger(ProdutoDAO.class.getName()).log(Level.SEVERE, null, ex);
@@ -34,25 +80,20 @@ public class ProdutoDAO {
         }
     }
     
-    public Produto Abrir (int id) {
+    public List<Produto> listarTodos() {
         try {
-            Produto produto = new Produto(0, "", 0);
-            
-            Statement comando = bd.getConexao().createStatement();
-            ResultSet resultado = comando.executeQuery("select * from produtos where id = " + id);
-            
-            resultado.first();
-            
-            produto.setId(resultado.getInt("id"));
-            produto.setNome(resultado.getString("nome"));
-            produto.setValor(resultado.getDouble("valor"));
-            
-            return produto;
-            
+            PreparedStatement comando = bd.getConexao().prepareStatement("select * from produtos ");
+            ResultSet resultado = comando.executeQuery();
+            // Cria uma lista de produtos vazia
+            List<Produto> produtos = new LinkedList<>();
+            while(resultado.next()){
+                Produto tmp = new Produto();
+                
+            }
+            return produtos;
         } catch (SQLException ex) {
             Logger.getLogger(ProdutoDAO.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
-    
 }

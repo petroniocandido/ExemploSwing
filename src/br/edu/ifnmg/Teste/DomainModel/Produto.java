@@ -13,6 +13,12 @@ public class Produto {
     String nome;
     double valor;
     
+    public Produto(){
+        this.id = 0;
+        this.nome = "";
+        this.valor = 0;
+    }
+    
     public Produto(int id_, String nom, double val){
         this.id = id_;
         this.nome = nom;
