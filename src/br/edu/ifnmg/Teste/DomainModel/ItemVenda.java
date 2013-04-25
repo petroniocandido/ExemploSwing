@@ -14,6 +14,7 @@ public class ItemVenda {
     int id;
     Produto produto;
     int quantidade;
+    boolean ativo;
 
     public int getId() {
         return id;
@@ -39,6 +40,14 @@ public class ItemVenda {
         this.quantidade = quantidade;
     }
 
+    public boolean isAtivo() {
+        return ativo;
+    }
+
+    public void setAtivo(boolean ativo) {
+        this.ativo = ativo;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 7*id;

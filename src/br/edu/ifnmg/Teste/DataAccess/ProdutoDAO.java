@@ -87,8 +87,40 @@ public class ProdutoDAO {
             // Cria uma lista de produtos vazia
             List<Produto> produtos = new LinkedList<>();
             while(resultado.next()){
+                // Inicializa um objeto de produto vazio
                 Produto tmp = new Produto();
-                
+                // Pega os valores do retorno da consulta e coloca no objeto
+                tmp.setId(resultado.getInt("id"));
+                tmp.setNome(resultado.getString("nome"));
+                tmp.setValor(resultado.getDouble("valor"));
+                // Pega o objeto e coloca na lista
+                produtos.add(tmp);                
+            }
+            return produtos;
+        } catch (SQLException ex) {
+            Logger.getLogger(ProdutoDAO.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    
+    public List<Produto> buscar(Produto filtro) {
+        try {
+            PreparedStatement comando = bd.getConexao().prepareStatement("select * from produtos where nome like '%?%' or valor = ? or id = ? ");
+            comando.setString(0, filtro.getNome());
+            comando.setDouble(1, filtro.getValor());
+            comando.setInt(2, filtro.getId());
+            ResultSet resultado = comando.executeQuery();
+            // Cria uma lista de produtos vazia
+            List<Produto> produtos = new LinkedList<>();
+            while(resultado.next()){
+                // Inicializa um objeto de produto vazio
+                Produto tmp = new Produto();
+                // Pega os valores do retorno da consulta e coloca no objeto
+                tmp.setId(resultado.getInt("id"));
+                tmp.setNome(resultado.getString("nome"));
+                tmp.setValor(resultado.getDouble("valor"));
+                // Pega o objeto e coloca na lista
+                produtos.add(tmp);                
             }
             return produtos;
         } catch (SQLException ex) {
