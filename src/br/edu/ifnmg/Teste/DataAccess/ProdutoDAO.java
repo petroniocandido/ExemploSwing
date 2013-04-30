@@ -8,6 +8,7 @@ import br.edu.ifnmg.Teste.DomainModel.Produto;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
@@ -29,14 +30,14 @@ public class ProdutoDAO {
         try {
             if (obj.getId() == 0) {
                 PreparedStatement comando = bd.getConexao().prepareStatement("insert into produtos(nome,valor) values(?,?)");
-                comando.setString(0, obj.getNome());
-                comando.setDouble(1, obj.getValor());
+                comando.setString(1, obj.getNome());
+                comando.setDouble(2, obj.getValor());
                 comando.executeUpdate();
             } else {
                 PreparedStatement comando = bd.getConexao().prepareStatement("update produtos set nome = ?,valor = ? where id = ?");
-                comando.setString(0, obj.getNome());
-                comando.setDouble(1, obj.getValor());
-                comando.setDouble(2, obj.getId());
+                comando.setString(1, obj.getNome());
+                comando.setDouble(2, obj.getValor());
+                comando.setDouble(3, obj.getId());
                 comando.executeUpdate();
             }
             return true;
@@ -51,7 +52,7 @@ public class ProdutoDAO {
             Produto produto = new Produto(0, "", 0);
 
             PreparedStatement comando = bd.getConexao().prepareStatement("select * from produtos where id = ?");
-            comando.setInt(0, id);
+            comando.setInt(1, id);
             ResultSet resultado = comando.executeQuery();
 
             resultado.first();
@@ -79,14 +80,14 @@ public class ProdutoDAO {
             return false;
         }
     }
-    
+
     public List<Produto> listarTodos() {
         try {
             PreparedStatement comando = bd.getConexao().prepareStatement("select * from produtos ");
             ResultSet resultado = comando.executeQuery();
             // Cria uma lista de produtos vazia
             List<Produto> produtos = new LinkedList<>();
-            while(resultado.next()){
+            while (resultado.next()) {
                 // Inicializa um objeto de produto vazio
                 Produto tmp = new Produto();
                 // Pega os valores do retorno da consulta e coloca no objeto
@@ -94,7 +95,7 @@ public class ProdutoDAO {
                 tmp.setNome(resultado.getString("nome"));
                 tmp.setValor(resultado.getDouble("valor"));
                 // Pega o objeto e coloca na lista
-                produtos.add(tmp);                
+                produtos.add(tmp);
             }
             return produtos;
         } catch (SQLException ex) {
@@ -102,17 +103,38 @@ public class ProdutoDAO {
             return null;
         }
     }
-    
+
     public List<Produto> buscar(Produto filtro) {
         try {
-            PreparedStatement comando = bd.getConexao().prepareStatement("select * from produtos where nome like '%?%' or valor = ? or id = ? ");
-            comando.setString(0, filtro.getNome());
-            comando.setDouble(1, filtro.getValor());
-            comando.setInt(2, filtro.getId());
-            ResultSet resultado = comando.executeQuery();
+            
+            String sql = "select * from produtos ";
+            String where = "";
+            
+            if(filtro.getNome().length() > 0){
+                where = "nome like '%"+filtro.getNome()+"%'";
+            }
+            
+            if (filtro.getValor() > 0) {
+                if(where.length() > 0) 
+                    where = where + " and ";
+                where = where + " valor = " + filtro.getValor();
+            }
+            if (filtro.getId() > 0) {
+                if(where.length() > 0) 
+                    where = where + " and ";
+                where = where + " id = " + filtro.getId();
+            }
+            
+            if(where.length() > 0){
+                sql = sql + " where " + where;
+            }
+            
+            Statement comando = bd.getConexao().createStatement();
+            
+            ResultSet resultado = comando.executeQuery(sql);
             // Cria uma lista de produtos vazia
             List<Produto> produtos = new LinkedList<>();
-            while(resultado.next()){
+            while (resultado.next()) {
                 // Inicializa um objeto de produto vazio
                 Produto tmp = new Produto();
                 // Pega os valores do retorno da consulta e coloca no objeto
@@ -120,7 +142,7 @@ public class ProdutoDAO {
                 tmp.setNome(resultado.getString("nome"));
                 tmp.setValor(resultado.getDouble("valor"));
                 // Pega o objeto e coloca na lista
-                produtos.add(tmp);                
+                produtos.add(tmp);
             }
             return produtos;
         } catch (SQLException ex) {
