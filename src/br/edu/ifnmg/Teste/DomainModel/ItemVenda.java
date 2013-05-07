@@ -75,6 +75,10 @@ public class ItemVenda {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return produto.getNome();
+    }
     
     
 }

@@ -4,9 +4,12 @@
  */
 package br.edu.ifnmg.Teste.InterfaceUsuario;
 
+import br.edu.ifnmg.Teste.DataAccess.ProdutoDAO;
+import br.edu.ifnmg.Teste.DataAccess.VendaDAO;
 import br.edu.ifnmg.Teste.DomainModel.ItemVenda;
 import br.edu.ifnmg.Teste.DomainModel.Produto;
 import br.edu.ifnmg.Teste.DomainModel.Venda;
+import java.util.Formatter;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
@@ -23,16 +26,20 @@ public class frmVenda extends javax.swing.JInternalFrame {
      * Creates new form frmVenda
      */
     Venda venda;
+    ItemVenda itemVenda;
     List<Produto> produtos;
+    ProdutoDAO prodDAO;
+    VendaDAO vendDAO;
 
     public frmVenda() {
         initComponents();
+        
+        prodDAO = new ProdutoDAO();
+        vendDAO = new VendaDAO();
         venda = new Venda();
-        produtos = new LinkedList<>();
-        produtos.add(new Produto(1, "Escova de Dentes", 1.27));
-        produtos.add(new Produto(2, "Creme Dental", 5));
-        produtos.add(new Produto(3, "Fio Dental", 3));
-
+        
+        produtos = prodDAO.listarTodos();
+        
         cbxProdutos.removeAllItems();
         for (Produto p : produtos) {
             cbxProdutos.addItem(p);
@@ -44,13 +51,15 @@ public class frmVenda extends javax.swing.JInternalFrame {
         lblValorTotal.setText(Double.toString(venda.getValorTotal()));
 
         DefaultTableModel model = new DefaultTableModel();
+        model.addColumn("ID");
         model.addColumn("Produto");
         model.addColumn("Quantidade");
 
         for (ItemVenda i : venda.getItens()) {
             Vector v = new Vector();
-            v.add(i.getProduto().getNome());
-            v.add(i.getQuantidade());
+            v.add(i.getId());
+            v.add(i);
+            v.add(i.getQuantidade());            
             model.addRow(v);
         }
 
@@ -70,10 +79,10 @@ public class frmVenda extends javax.swing.JInternalFrame {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
-        jFormattedTextField1 = new javax.swing.JFormattedTextField();
         jTextField1 = new javax.swing.JTextField();
         jLabel5 = new javax.swing.JLabel();
         lblValorTotal = new javax.swing.JLabel();
+        txtData = new javax.swing.JFormattedTextField();
         jPanel2 = new javax.swing.JPanel();
         jLabel3 = new javax.swing.JLabel();
         cbxProdutos = new javax.swing.JComboBox();
@@ -82,6 +91,7 @@ public class frmVenda extends javax.swing.JInternalFrame {
         btnAdicionarItem = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         tblItens = new javax.swing.JTable();
+        btnRemoverItem = new javax.swing.JButton();
         btnSalvar = new javax.swing.JButton();
         btnCancelar = new javax.swing.JButton();
 
@@ -108,13 +118,13 @@ public class frmVenda extends javax.swing.JInternalFrame {
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 317, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblValorTotal)))
-                .addContainerGap(75, Short.MAX_VALUE))
+                .addContainerGap(146, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -126,7 +136,7 @@ public class frmVenda extends javax.swing.JInternalFrame {
                 .addGap(18, 18, 18)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jFormattedTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(txtData, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(29, 29, 29)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel5)
@@ -160,7 +170,19 @@ public class frmVenda extends javax.swing.JInternalFrame {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblItens.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblItensMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblItens);
+
+        btnRemoverItem.setText("Remover");
+        btnRemoverItem.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRemoverItemActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -168,8 +190,8 @@ public class frmVenda extends javax.swing.JInternalFrame {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -179,8 +201,10 @@ public class frmVenda extends javax.swing.JInternalFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(txtQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(btnAdicionarItem)))
-                .addContainerGap(51, Short.MAX_VALUE))
+                        .addComponent(btnAdicionarItem)
+                        .addGap(18, 18, 18)
+                        .addComponent(btnRemoverItem)))
+                .addContainerGap(29, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -191,7 +215,8 @@ public class frmVenda extends javax.swing.JInternalFrame {
                     .addComponent(cbxProdutos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4)
                     .addComponent(txtQuantidade, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(btnAdicionarItem))
+                    .addComponent(btnAdicionarItem)
+                    .addComponent(btnRemoverItem))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 147, Short.MAX_VALUE)
                 .addContainerGap())
@@ -199,7 +224,7 @@ public class frmVenda extends javax.swing.JInternalFrame {
 
         jTabbedPane1.addTab("Itens", jPanel2);
 
-        btnSalvar.setText("Salva");
+        btnSalvar.setText("Salvar");
         btnSalvar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSalvarActionPerformed(evt);
@@ -214,10 +239,10 @@ public class frmVenda extends javax.swing.JInternalFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jTabbedPane1)
+                .addComponent(jTabbedPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap(302, Short.MAX_VALUE)
                 .addComponent(btnSalvar)
                 .addGap(18, 18, 18)
                 .addComponent(btnCancelar)
@@ -232,7 +257,7 @@ public class frmVenda extends javax.swing.JInternalFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnSalvar)
                     .addComponent(btnCancelar))
-                .addContainerGap(20, Short.MAX_VALUE))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         pack();
@@ -259,15 +284,62 @@ public class frmVenda extends javax.swing.JInternalFrame {
         }
     }//GEN-LAST:event_btnAdicionarItemActionPerformed
 
+    private void carregaObjeto() {
+        
+    }
+    
     private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
-        // TODO add your handling code here:
+        try {
+            if (JOptionPane.showConfirmDialog(rootPane, "Deseja Salvar?") == 0) {
+
+                carregaObjeto();
+                
+                if (vendDAO.Salvar(venda)) {
+                    JOptionPane.showMessageDialog(rootPane, "Salvo com sucesso!");
+                } else {
+                    JOptionPane.showMessageDialog(rootPane, "Falha ao salvar! Consulte o administrador do sistema!");
+                }
+
+            } else {                
+                JOptionPane.showMessageDialog(rootPane, "Operação cancelada!");
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(rootPane, "Erro ao salvar! Consulte o administrador do sistema!");
+        }
     }//GEN-LAST:event_btnSalvarActionPerformed
+
+    private void carregaItem() {
+        cbxProdutos.setSelectedItem(itemVenda.getProduto());
+        txtQuantidade.setText(Integer.toString(itemVenda.getQuantidade()));
+    }
+    
+    private void tblItensMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblItensMouseClicked
+        Object valor = tblItens.getValueAt( tblItens.getSelectedRow(), 1);
+        itemVenda = (ItemVenda)valor;       
+        carregaItem();
+    }//GEN-LAST:event_tblItensMouseClicked
+
+    private void btnRemoverItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRemoverItemActionPerformed
+        if (JOptionPane.showConfirmDialog(rootPane, "Deseja realmente remover o item?")
+                == 0) {
+
+            venda.remove(itemVenda);
+
+            JOptionPane.showMessageDialog(rootPane, "Item removido com sucesso!");
+
+            configuraCamposFormulario();
+        }
+        else {
+            JOptionPane.showMessageDialog(rootPane, "Ação cancelada pelo usuário!");
+        }
+    }//GEN-LAST:event_btnRemoverItemActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdicionarItem;
     private javax.swing.JButton btnCancelar;
+    private javax.swing.JButton btnRemoverItem;
     private javax.swing.JButton btnSalvar;
     private javax.swing.JComboBox cbxProdutos;
-    private javax.swing.JFormattedTextField jFormattedTextField1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -280,6 +352,7 @@ public class frmVenda extends javax.swing.JInternalFrame {
     private javax.swing.JTextField jTextField1;
     private javax.swing.JLabel lblValorTotal;
     private javax.swing.JTable tblItens;
+    private javax.swing.JFormattedTextField txtData;
     private javax.swing.JTextField txtQuantidade;
     // End of variables declaration//GEN-END:variables
 }
