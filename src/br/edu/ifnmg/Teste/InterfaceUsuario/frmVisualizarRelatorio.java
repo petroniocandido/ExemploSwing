@@ -14,10 +14,13 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import net.sf.jasperreports.view.JasperViewer;
 
 /**
@@ -74,31 +77,14 @@ public class frmVisualizarRelatorio extends javax.swing.JInternalFrame {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         Connection conexao;
         try {
+            Map parameterMap = new HashMap();
 
             Class.forName("com.mysql.jdbc.Driver");
             conexao = DriverManager
                     .getConnection("jdbc:mysql://localhost:3306/teste", "root", "12345");
 
-            // - Chargement et compilation du rapport
-
-            URL arquivo = getClass().getResource("RelatorioTeste.jasper");
-
-            Map parameterMap = new HashMap();
-            /*
-             JasperDesign jasperDesign = JRXmlLoader.load("/Relatorio/RelatorioTeste.jrxml");
-             JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
-             
-
-             // // - Execution du rapport
-             JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, conexao);
-             JasperViewer.viewReport(jasperPrint);
-             //JasperExportManager.exportReportToPdfFile(jasperPrint, "C:/Documents and Settings/report2.pdf");
-             */
-            JasperReport jasperReport = (JasperReport) JRLoader.loadObject(arquivo);
-//aqui, como não vais passar parâmetros para dentro do relatório, e porque estou a assumir que não tenhas ligação com base de dados, os dois ultimos parametros são nulos  
-            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, conexao);
-//isto mostra.te o viewer, penso que é a melhor maneira, pois assim a pessoa escolhe o formato em que quer gravar, e o sitio onde gravar  
-            JasperViewer jrviewer = new JasperViewer(jasperPrint, false);
+            URL arquivo = getClass().getResource("RelatorioTeste.jrxml");
+            JasperViewer jrviewer = loadJrxml(arquivo, parameterMap, conexao);
             jrviewer.setVisible(true);
         } catch (JRException ex) {
             Logger.getLogger(frmVisualizarRelatorio.class.getName()).log(Level.SEVERE, null, ex);
@@ -112,4 +98,21 @@ public class frmVisualizarRelatorio extends javax.swing.JInternalFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
     // End of variables declaration//GEN-END:variables
+
+    private JasperViewer loadJasper(URL arquivo, Map parameterMap, Connection conexao) throws JRException {
+
+        JasperReport jasperReport = (JasperReport) JRLoader.loadObject(arquivo);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, conexao);
+        JasperViewer jrviewer = new JasperViewer(jasperPrint, false);
+        return jrviewer;
+    }
+
+    private JasperViewer loadJrxml(URL arquivo, Map parameterMap, Connection conexao) throws JRException {
+
+        JasperDesign jasperDesign = JRXmlLoader.load(arquivo.getFile());
+        JasperReport jasperReport = JasperCompileManager.compileReport(jasperDesign);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, conexao);
+        JasperViewer jrviewer = new JasperViewer(jasperPrint, false);
+        return jrviewer;
+    }
 }
