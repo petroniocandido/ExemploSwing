@@ -1,5 +1,22 @@
 package br.edu.ifnmg.Teste.InterfaceUsuario;
 
+import br.edu.ifnmg.Teste.DataAccess.BD;
+import java.net.URL;
+import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.design.JasperDesign;
+import net.sf.jasperreports.engine.util.JRLoader;
+import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.view.JasperViewer;
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -165,11 +182,40 @@ public class frmPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_jMenu4ActionPerformed
 
     private void jMenuItem5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem5ActionPerformed
-        frmVisualizarRelatorio janela = new frmVisualizarRelatorio();
-        add(janela);
-        janela.setVisible(true);
+        exibeRelatorioJasper("RelatorioTeste.jasper");
     }//GEN-LAST:event_jMenuItem5ActionPerformed
 
+    private void exibeRelatorioJasper(String relatorio) {
+
+        Connection conexao;
+        try {
+            Map parameterMap = new HashMap();
+
+            BD bd = new BD();
+
+            // Pega a conexão com o banco de dados
+            conexao = bd.getConexao();
+
+            // Pega o caminho do arquivo do relatório
+            URL arquivo = getClass().getResource(relatorio);
+            
+            // Carrega o relatório na memória
+            JasperReport jasperReport = (JasperReport) JRLoader.loadObject(arquivo);
+            
+            // Carrega os dados do relatório
+            JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameterMap, conexao);
+            
+            // Visualiza o relatório
+            JasperViewer jrviewer = new JasperViewer(jasperPrint, false);
+            
+            jrviewer.setVisible(true);
+        
+        } catch (JRException ex) {
+            Logger.getLogger(JasperReport.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -216,4 +262,5 @@ public class frmPrincipal extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem4;
     private javax.swing.JMenuItem jMenuItem5;
     // End of variables declaration//GEN-END:variables
+
 }

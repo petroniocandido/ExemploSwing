@@ -14,6 +14,12 @@ FROM
 	<field name="produtos_nome" class="java.lang.String"/>
 	<field name="produtos_valor" class="java.lang.Double"/>
 	<field name="produtos_id" class="java.lang.Integer"/>
+	<variable name="Soma" class="java.lang.Integer" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{produtos_valor}]]></variableExpression>
+	</variable>
+	<variable name="Somatorio" class="java.lang.Integer" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{produtos_valor}]]></variableExpression>
+	</variable>
 	<group name="produtos_nome">
 		<groupExpression><![CDATA[$F{produtos_nome}]]></groupExpression>
 	</group>
@@ -21,7 +27,15 @@ FROM
 		<band splitType="Stretch"/>
 	</background>
 	<title>
-		<band height="79" splitType="Stretch"/>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="0f0845b3-aa3b-42d9-84b1-3822341e4ada" positionType="Float" x="161" y="26" width="240" height="20" forecolor="#0000FF"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true" isItalic="true"/>
+				</textElement>
+				<text><![CDATA[RELATÓRIO DE PRODUTOS]]></text>
+			</staticText>
+		</band>
 	</title>
 	<pageHeader>
 		<band height="35" splitType="Stretch"/>
@@ -30,19 +44,28 @@ FROM
 		<band height="38" splitType="Stretch">
 			<staticText>
 				<reportElement uuid="c7102fc2-a6ee-4e21-9439-3aa392cc9a5d" x="16" y="0" width="100" height="20"/>
-				<textElement/>
-				<text><![CDATA[produtos_id]]></text>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[ID]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="9c739125-67fd-424a-96a2-2770238d9d4a" x="172" y="2" width="100" height="20"/>
-				<textElement/>
-				<text><![CDATA[produtos_nome]]></text>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Nome]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="52393df6-11d3-4f60-aba7-a01af2d61242" x="365" y="2" width="100" height="20"/>
-				<textElement/>
-				<text><![CDATA[produtos_valor]]></text>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Valor]]></text>
 			</staticText>
+			<line>
+				<reportElement uuid="2f434bc8-e587-4a50-87c9-1fc03ad4417f" x="16" y="26" width="539" height="1"/>
+			</line>
 		</band>
 	</columnHeader>
 	<detail>
@@ -65,10 +88,37 @@ FROM
 		</band>
 	</detail>
 	<columnFooter>
-		<band height="45" splitType="Stretch"/>
+		<band height="45" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="36f7af32-61c9-419c-a1a7-9be51f107fad" x="279" y="17" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Valor Total:]]></text>
+			</staticText>
+			<textField>
+				<reportElement uuid="9c004263-ad11-4bf5-a722-4be7300137c7" x="365" y="17" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$V{Somatorio}]]></textFieldExpression>
+			</textField>
+		</band>
 	</columnFooter>
 	<pageFooter>
-		<band height="54" splitType="Stretch"/>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement uuid="63f38ace-b855-4691-9c4a-a02a998ce754" x="421" y="14" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement uuid="a881bc4e-80cc-4f11-a773-269e37fb0834" x="501" y="14" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="EEEEE dd MMMMM yyyy">
+				<reportElement uuid="d6f0f1a0-31cb-47a9-b10d-f65a710e3bc1" x="16" y="14" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
 	</pageFooter>
 	<summary>
 		<band height="42" splitType="Stretch"/>
