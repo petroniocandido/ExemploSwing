@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="null" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="96374726-3abc-44b4-b34e-f4994cde928b">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+     produtos.`nome` AS produtos_nome,
+     produtos.`valor` AS produtos_valor,
+     produtos.`id` AS produtos_id
+FROM
+     `produtos` produtos]]>
+	</queryString>
+	<field name="produtos_nome" class="java.lang.String"/>
+	<field name="produtos_valor" class="java.lang.Double"/>
+	<field name="produtos_id" class="java.lang.Integer"/>
+	<group name="produtos_nome">
+		<groupExpression><![CDATA[$F{produtos_nome}]]></groupExpression>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="38" splitType="Stretch">
+			<staticText>
+				<reportElement uuid="c7102fc2-a6ee-4e21-9439-3aa392cc9a5d" x="16" y="0" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[produtos_id]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9c739125-67fd-424a-96a2-2770238d9d4a" x="172" y="2" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[produtos_nome]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="52393df6-11d3-4f60-aba7-a01af2d61242" x="365" y="2" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[produtos_valor]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="26" splitType="Stretch">
+			<textField>
+				<reportElement uuid="a07f746f-8c9a-4c9f-8409-5e76013d106b" x="16" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{produtos_id}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b5fe7bf0-46fa-4c5b-a5de-142f4b205748" x="172" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{produtos_nome}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement uuid="b2e3506c-4c07-4a56-b8d2-12e08a69823d" x="365" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression><![CDATA[$F{produtos_valor}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
